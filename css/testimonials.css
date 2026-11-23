@@ -1,0 +1,316 @@
+/* Section 2 — Testimonials Horizontal Track (`#readers`) */
+.readers-contact-pin {
+  position: relative;
+}
+
+@media (min-width: 992px) and (prefers-reduced-motion: no-preference) {
+  html:not([data-reveal-fallback]) .readers-contact-pin:not([data-pin-built]) {
+    margin-bottom: 176vw;
+  }
+}
+
+.readers-section {
+  position: relative;
+  height: auto;
+  min-height: 0;
+  padding-top: var(--readers-pt, 2.75rem);
+  padding-bottom: var(--readers-pb, 2.75rem);
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--void);
+  border-top: 1px solid var(--hair);
+  display: flex;
+  align-items: center;
+  direction: ltr;
+}
+
+.readers-section:not([data-hydrated]) {
+  min-height: var(--readers-reserve, 31rem);
+}
+
+.readers-bg-word {
+  position: absolute;
+  left: 38vw;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: "Readex Pro", sans-serif;
+  font-weight: 700;
+  font-size: 23rem;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-text-stroke: 1.25px var(--paper);
+  color: transparent;
+  opacity: 0.14;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  direction: rtl;
+}
+
+.readers-track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding-inline: 3.8rem;
+  gap: 5rem;
+  width: max-content;
+  direction: ltr;
+}
+
+.readers-intro {
+  width: 36rem;
+  flex-shrink: 0;
+  direction: rtl;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.8rem;
+}
+
+.readers-scroll-hint {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--mute);
+}
+
+.readers-scroll-arrow {
+  display: inline-block;
+  animation: caretBlink 0.8s steps(1) infinite;
+  animation-play-state: paused;
+}
+
+.readers-section.is-in-view .readers-scroll-arrow {
+  animation-play-state: running;
+}
+
+.reader-card {
+  position: relative;
+  width: 26rem;
+  min-height: 0;
+  height: auto;
+  flex-shrink: 0;
+  background: var(--sheet);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: var(--review-card-pt, 2.25rem) 2.2rem var(--review-card-pb, 2.25rem);
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.48);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  direction: rtl;
+  text-align: right;
+}
+
+.card-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--ink);
+}
+
+.card-since {
+  color: rgba(23, 23, 23, 0.68);
+}
+
+.card-dotted-rule {
+  border-top: 1px dotted rgba(23, 23, 23, 0.45);
+  width: 100%;
+}
+
+.card-quote {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-weight: 500;
+  font-size: 1.32rem;
+  line-height: 1.55;
+  color: var(--ink);
+  padding-top: var(--review-text-pt, 4.5rem);
+  padding-bottom: var(--review-text-pb, 4.5rem);
+}
+
+.card-meta-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.card-author-name {
+  font-family: "Readex Pro", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.card-author-role {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: rgba(23, 23, 23, 0.72);
+}
+
+.card-due {
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.card-due-label {
+  color: rgba(23, 23, 23, 0.65);
+}
+
+.due-date-value {
+  margin-top: 0.2rem;
+  font-family: "Readex Pro", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.card-stamp-word {
+  font-family: "Readex Pro", sans-serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+}
+
+.card-stamp-date {
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.readers-progress {
+  position: absolute;
+  left: 3.8rem;
+  bottom: 1.15rem;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  z-index: 3;
+  direction: ltr;
+}
+
+.readers-counter {
+  color: var(--paper);
+  min-width: 4.5rem;
+}
+
+.readers-progress-track {
+  width: 20rem;
+  height: 1px;
+  background: var(--hair);
+  overflow: hidden;
+}
+
+.readers-progress-fill {
+  width: 100%;
+  height: 100%;
+  background: var(--paper);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+@media (max-width: 991px) {
+  .readers-section {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: var(--readers-pt, 2.75rem) 1.5rem var(--readers-pb, 2.75rem);
+    display: block;
+    direction: rtl;
+  }
+
+  .readers-section:not([data-hydrated]) {
+    min-height: var(--readers-mobile-reserve, 130rem);
+  }
+
+  .readers-bg-word,
+  .readers-progress,
+  .readers-scroll-hint {
+    display: none;
+  }
+
+  .readers-track {
+    width: 100%;
+    padding-inline: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+    direction: rtl;
+  }
+
+  .readers-intro {
+    width: 100%;
+  }
+
+  .reader-card {
+    width: min(26rem, 100%);
+    height: auto;
+    min-height: 0;
+    margin-top: 0 !important;
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .readers-section {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: var(--readers-pt, 2.75rem) 3.8rem var(--readers-pb, 2.75rem);
+    display: block;
+    direction: rtl;
+  }
+  .readers-bg-word,
+  .readers-progress,
+  .readers-scroll-hint {
+    display: none;
+  }
+  .readers-track {
+    width: 100%;
+    padding-inline: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    gap: 2.5rem;
+    direction: rtl;
+  }
+  .readers-intro {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+  .reader-card {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin-top: 0 !important;
+    transform: none !important;
+  }
+  .readers-scroll-arrow {
+    animation: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .readers-section {
+    height: auto;
+    min-height: 0;
+    padding-top: var(--readers-pt, var(--section-space));
+    padding-bottom: var(--readers-pb, var(--section-space));
+    margin-block: 0;
+  }
+
+  .readers-section > *:first-child,
+  .readers-track > *:first-child {
+    margin-top: 0;
+  }
+
+  .readers-section > *:last-child,
+  .readers-track > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .readers-track {
+    gap: var(--section-inner-gap);
+  }
+}

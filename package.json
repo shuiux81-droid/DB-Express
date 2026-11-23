@@ -1,0 +1,12 @@
+{
+  "name": "digital-express-native",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --input-type=commonjs -e \"const http=require('http'),fs=require('fs'),path=require('path');const mime={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.ico':'image/x-icon','.woff2':'font/woff2','.mp4':'video/mp4','.webm':'video/webm'};http.createServer((req,res)=>{const u=(req.url||'/').split('?')[0];let rel='/index.html';try{rel=decodeURIComponent(u==='/'?'/index.html':u)}catch{};const f=path.resolve('.'+rel);if(!f.startsWith(path.resolve('.'))){res.writeHead(403);return res.end()}fs.stat(f,(e,s)=>{if(e||!s.isFile()){res.writeHead(404);return res.end('Not found')}const ext=path.extname(f).toLowerCase(),ct=mime[ext]||'application/octet-stream',cc=ext==='.html'?'no-cache':rel.startsWith('/assets/')?'public, max-age=31536000':'public, max-age=86400',r=req.headers.range;if(r){const m=/bytes=(\\d*)-(\\d*)/.exec(r);const a=m&&m[1]?+m[1]:0,b=m&&m[2]?+m[2]:s.size-1;res.writeHead(206,{'Content-Range':'bytes '+a+'-'+b+'/'+s.size,'Accept-Ranges':'bytes','Content-Length':b-a+1,'Content-Type':ct,'Cache-Control':cc});return fs.createReadStream(f,{start:a,end:b}).pipe(res)}res.writeHead(200,{'Content-Length':s.size,'Accept-Ranges':'bytes','Content-Type':ct,'Cache-Control':cc});fs.createReadStream(f).pipe(res)})}).listen(3000,'0.0.0.0')\"",
+    "build": "npm run lint && npm test",
+    "lint": "for f in js/main.js js/data.js js/engine/*.js js/engine/scroll/*.js js/sections/*.js js/utils/*.js; do node --check \"$f\" || exit 1; done",
+    "test": "node --test tests/utils.test.mjs"
+  }
+}

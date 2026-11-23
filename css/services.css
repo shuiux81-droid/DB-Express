@@ -1,0 +1,606 @@
+/* Services v2 Centred Card Deck (`#drops` / `.services`) */
+.drops-section.services {
+  --svc-red: #ED2924;
+  --svc-bg: #F7F7F7;
+  --svc-border: #E5E5E5;
+  --svc-muted: #6e6e6e;
+  --pt: var(--services-pt, clamp(5.5rem, 11vh, 7rem));
+  --pb: var(--services-pb, clamp(1.2rem, 3.5vh, 2.5rem));
+  position: relative;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--pt) 3.8rem var(--pb);
+  box-sizing: border-box;
+  overflow: clip;
+  font-size: calc(1rem * var(--fit, 1));
+  text-align: center;
+  background-color: var(--svc-bg);
+  border-top: 1px solid var(--svc-border);
+  border-bottom: 1px solid var(--svc-border);
+  color: var(--ink);
+  direction: rtl;
+}
+
+@media (min-width: 992px) and (prefers-reduced-motion: no-preference) {
+  html:not([data-reveal-fallback]) #drops:not([data-pin-built]) {
+    margin-bottom: calc(75vh * 5.6);
+  }
+}
+
+.svc-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.section-h2 {
+  font-family: "Readex Pro", sans-serif;
+  font-size: 4.6em;
+  line-height: 1.02;
+  letter-spacing: 0;
+  font-weight: 700;
+  color: var(--ink);
+  max-width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
+.h2-line {
+  display: block;
+  overflow: clip;
+  white-space: nowrap;
+  padding-top: 0.08em;
+  margin-top: -0.08em;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.h2-line-inner {
+  display: block;
+}
+
+.h2-word {
+  display: inline-block;
+  font-weight: 700;
+}
+
+.section-h2 .alt-word {
+  color: var(--svc-red);
+  font-weight: 800;
+}
+
+.svc-sticker {
+  display: inline-block;
+  background-color: var(--svc-red);
+  color: var(--paper);
+  font-family: "Readex Pro", sans-serif;
+  font-size: 0.95em;
+  font-weight: 700;
+  line-height: 1.3;
+  padding: 0.5em 1em;
+  border-radius: 0.6em;
+  transform: rotate(-3deg) translateX(-5em);
+  transform-origin: center center;
+  margin-top: -0.9em;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0.35em 0 rgba(0, 0, 0, 0.18);
+  white-space: nowrap;
+}
+
+.svc-desc {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-size: 1.05em;
+  line-height: 1.7;
+  color: var(--svc-muted);
+  max-width: 46em;
+  margin-top: 0.8em;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.svc-stage {
+  flex: 1 1 0;
+  min-height: 22em;
+  width: 100%;
+  position: relative;
+  margin-top: 0.8em;
+  container-type: size;
+  perspective: 1400px;
+}
+
+.svc-card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: min(94cqw, calc(82cqh * 2.7));
+  aspect-ratio: 2.7 / 1;
+  border-radius: 1.4em;
+  transform-origin: 50% 50%;
+  box-shadow: 0 1.2em 2.2em rgba(0, 0, 0, 0.1);
+}
+
+.svc-card[data-theme="red"] {
+  --card-bg: var(--svc-red);
+  --card-fg: var(--paper);
+  --card-border: rgba(255, 255, 255, 0.18);
+}
+
+.svc-card[data-theme="ink"] {
+  --card-bg: var(--ink);
+  --card-fg: var(--paper);
+  --card-border: rgba(255, 255, 255, 0.14);
+}
+
+.svc-card[data-theme="paper"] {
+  --card-bg: var(--paper);
+  --card-fg: var(--ink);
+  --card-border: rgba(23, 23, 23, 0.12);
+}
+
+.svc-card-btn {
+  width: 100%;
+  height: 100%;
+  padding: 1.6em;
+  gap: 2em;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36%;
+  align-items: stretch;
+  background-color: var(--card-bg, var(--svc-red));
+  color: var(--card-fg, var(--paper));
+  border-radius: inherit;
+  border: 1px solid var(--card-border, rgba(0, 0, 0, 0.12));
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: start;
+  transition: filter 0.2s ease, border-color 0.2s ease;
+}
+
+.svc-card-btn:hover {
+  filter: brightness(1.02);
+}
+
+.svc-card-btn:focus-visible {
+  outline: 2px solid var(--svc-red);
+  outline-offset: 4px;
+}
+
+.svc-card-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1em;
+  min-width: 0;
+  padding-top: 0.2em;
+  text-align: start;
+}
+
+.svc-card-pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Readex Pro", sans-serif;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.3em 0.8em;
+  border-radius: 99em;
+  border: 1.5px solid currentColor;
+  color: inherit;
+  opacity: 1;
+  white-space: nowrap;
+}
+
+.svc-card[data-theme="red"] .svc-card-pill {
+  background-color: rgba(0, 0, 0, 0.14);
+}
+
+.svc-card-title {
+  font-family: "Readex Pro", sans-serif;
+  font-size: 3.4em;
+  font-weight: 700;
+  line-height: 1.12;
+  max-width: 12em;
+  color: inherit;
+  text-align: start;
+  margin: 0;
+}
+
+.svc-card-media {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 1em;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1f1f1f 0%, #111111 100%);
+}
+
+.svc-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.svc-card-btn:hover .svc-card-img {
+  transform: scale(1.03);
+}
+
+.case-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 30%, #2a2a2a 0%, #141414 100%);
+  color: rgba(255, 255, 255, 0.45);
+  font-family: "Readex Pro", sans-serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.case-gradient {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(23, 23, 23, 0.14) 0%,
+    rgba(23, 23, 23, 0.34) 48%,
+    rgba(23, 23, 23, 0.86) 100%
+  );
+  pointer-events: none;
+}
+
+.svc-stage--photo .svc-card-btn {
+  display: block;
+  padding: 0.6em;
+  background-color: var(--paper);
+  color: var(--paper);
+}
+
+.svc-stage--photo .svc-card-media {
+  border-radius: 0.9em;
+}
+
+.svc-stage--photo .svc-card-text {
+  position: absolute;
+  inset-inline: 1.75em;
+  bottom: 1.8em;
+  z-index: 2;
+  align-items: center;
+  justify-content: flex-end;
+  pointer-events: none;
+}
+
+.svc-stage--photo .svc-card-pill {
+  display: none;
+}
+
+.svc-stage--photo .svc-card-title {
+  text-align: center;
+  font-size: 2em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.svc-stage--photo .case-gradient {
+  display: block;
+}
+
+.case-tag {
+  position: absolute;
+  top: 1.15rem;
+  right: 1.15rem;
+  background-color: #ED2924;
+  color: #ffffff;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Case study modal */
+.case-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background-color: rgba(23, 23, 23, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.case-modal-backdrop[hidden] {
+  display: none;
+}
+
+.case-modal {
+  position: relative;
+  width: min(44rem, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: #ffffff;
+  color: #171717;
+  border-radius: 12px;
+  border: 1px solid #E5E5E5;
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.35);
+  padding: 1.25rem;
+}
+
+.case-modal-close {
+  position: absolute;
+  top: 1.85rem;
+  left: 1.85rem;
+  z-index: 5;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background-color: rgba(23, 23, 23, 0.78);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.case-modal-close:hover {
+  background-color: #ED2924;
+  border-color: #ED2924;
+}
+
+.case-modal-close:focus-visible,
+.case-modal-cta:focus-visible {
+  outline: 2px solid #ED2924;
+  outline-offset: 3px;
+}
+
+.case-modal-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #171717;
+}
+
+.case-modal-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.case-modal-body {
+  padding: 1.5rem 0.75rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.case-modal-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #737373;
+}
+
+.case-modal-title {
+  font-family: "Readex Pro", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #171717;
+}
+
+.case-modal-metric {
+  font-family: "Readex Pro", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ED2924;
+}
+
+.case-modal-summary {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #404040;
+}
+
+.case-modal-actions {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.case-modal-cta {
+  background-color: #171717;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.8rem 1.6rem;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.case-modal-cta:hover {
+  background-color: #ED2924;
+}
+
+@media (max-width: 991px) {
+  .drops-section.services {
+    height: auto;
+    overflow: visible;
+    padding: var(--services-pt, 5.5rem) 1.5rem var(--services-pb, 4.5rem);
+    font-size: 1rem;
+  }
+
+  .svc-head {
+    max-width: 100%;
+  }
+
+  .section-h2 {
+    font-size: 4.1em;
+  }
+
+  .svc-sticker {
+    transform: rotate(-3deg) translateX(-2.5em);
+  }
+
+  .svc-stage {
+    flex: none;
+    min-height: 0;
+    container-type: normal;
+    perspective: none;
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+  }
+
+  .svc-stage:not([data-hydrated]) {
+    min-height: var(--svc-stage-reserve, clamp(105rem, 220vw, 138rem));
+  }
+
+  .svc-card {
+    position: relative;
+    inset: auto;
+    margin: 0;
+    width: min(34rem, 100%);
+    height: auto;
+    aspect-ratio: auto;
+  }
+
+  .svc-card-btn {
+    grid-template-columns: 1fr;
+    padding: 1.15em;
+    gap: 1.15em;
+  }
+
+  .svc-card-media {
+    order: -1;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .svc-card-text {
+    gap: 0.85em;
+    padding-top: 0;
+  }
+
+  .svc-card-title {
+    font-size: 1.85em;
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .drops-section.services .section-h2 {
+    font-size: clamp(2.1rem, 10.6vw, 3.4em);
+  }
+  .drops-section.services .svc-sticker {
+    font-size: 0.85em;
+    transform: rotate(-3deg) translateX(-1.5em);
+    margin-top: -0.65em;
+  }
+  /* R5-STEP-1 */
+  .case-tag,
+  .case-modal-cta {
+    font-weight: 700;
+  }
+  /* /R5-STEP-1 */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drops-section.services {
+    height: auto;
+    overflow: visible;
+    padding: var(--services-pt, 5.5rem) 3.8rem var(--services-pb, 4.5rem);
+    font-size: 1rem;
+  }
+  .drops-section.services .svc-sticker {
+    transform: rotate(-3deg) translateX(-5em) !important;
+    opacity: 1 !important;
+  }
+  .drops-section.services .h2-line-inner {
+    transform: none !important;
+  }
+  .svc-stage {
+    flex: none;
+    min-height: 0;
+    container-type: normal;
+    perspective: none;
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+  .svc-card {
+    position: relative;
+    inset: auto;
+    margin: 0;
+    width: min(66rem, 100%);
+    height: auto;
+    aspect-ratio: 2.7 / 1;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  @media (max-width: 991px) {
+    .drops-section.services {
+      padding: var(--services-pt, 5rem) 1.5rem var(--services-pb, 4rem);
+    }
+    .svc-card {
+      width: min(34rem, 100%);
+      aspect-ratio: auto;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  #services {
+    padding-block: 0;
+    margin-block: 0;
+  }
+
+  .drops-section.services {
+    height: auto;
+    min-height: 0;
+    padding-block: var(--section-space);
+    margin-block: 0;
+  }
+
+  .drops-section.services > *:first-child,
+  .svc-head > *:first-child {
+    margin-top: 0;
+  }
+
+  .drops-section.services > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .svc-stage {
+    margin-top: var(--section-inner-gap);
+  }
+}

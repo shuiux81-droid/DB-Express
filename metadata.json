@@ -1,0 +1,8 @@
+{
+  "name": "Remix Rre Native DB Express-2",
+  "description": " شريكك في تقديم حلول رقمية متكاملة تجمع بين الإبداع والتكنولوجيا وتساعد علامتك التجارية على النمو والتميز.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

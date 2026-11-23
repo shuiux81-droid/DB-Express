@@ -1,0 +1,265 @@
+# Lacuna: About, Testimonials, Contact and Footer recreation prompt
+
+Extend the **Lacuna** landing page (a fictional members' reading room) with four sections that follow the existing hero: **About**, **Testimonials**, **Contact** and a **Footer**. The page is the same single self-contained HTML file (one inline `<style>`, one inline `<script>`, one self-hosted font family) and keeps the hero's look: pure black, Courier Prime typewriter type, paper-white ink, stipple and halftone texture, and the "select a word, strike it out, type the replacement" gesture from the hero headline. Every section has one signature **scroll-driven GSAP animation**: a manifesto that lights up word by word and rewrites itself, a stack of house-rule cards, library cards that slide past on a horizontal track and get stamped, a sheet of paper that rolls out of a typewriter, and a footer revealed from underneath like a curtain, where scattered letters fly together into the giant word LACUNA. Every animation and interaction below must be rebuilt exactly, with the same libraries, timings, easings and numbers.
+
+The hero is built from its own prompt and is not described here, except where this page changes how it behaves (6.2).
+
+---
+
+## 1. Libraries (load in this order, at the end of `<body>`)
+
+| Library | URL |
+|---|---|
+| GSAP 3.13.0 | https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js |
+| ScrollTrigger | https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js |
+| SplitText | https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js |
+| ScrambleTextPlugin | https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrambleTextPlugin.min.js |
+| DrawSVGPlugin | https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js |
+| Lenis 1.3.17 | https://cdn.jsdelivr.net/npm/lenis@1.3.17/dist/lenis.min.js |
+
+Register ScrollTrigger, SplitText, ScrambleTextPlugin and DrawSVGPlugin. If GSAP fails to load, make everything visible immediately in its final state (the page must never stay hidden). There is also a 4-second failsafe: if the page has not marked itself ready by then, reveal everything.
+
+## 2. Fonts
+
+Self-host the latin woff2 subset (in the standalone file embed as base64 data URIs), `font-display: swap`.
+
+| Family | Use | Weights | Google Fonts source |
+|---|---|---|---|
+| Courier Prime | Everything | 400, 400 italic, 700 | https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400 |
+
+## 3. Head, tokens and the scaling system
+
+- Title: **Lacuna: a reading room for restless minds**. Meta description: "Lacuna is a members' reading room for deep, phone-down reading." UTF-8 charset, `width=device-width, initial-scale=1` viewport.
+- Colour tokens: void `#050608` (page), navy `#0b0f17`, paper `#ece9e1` (main text on dark), mute `#8f8e89`, struck `#6b6a66`, hair `rgba(236,233,225,.14)` (all 1 px rules), key `#8a8a87` and key-shadow `#4a4a48` (keycap buttons), ticket `#f2f0ea`, ink `#111111`, **sheet** `#e9e5da` (the cream library cards and the typewriter sheet), **stamp** `#c8402a` (the one accent colour, used only on ink stamps and the focus caret).
+- Scaling: everything is sized in `rem`, and the root font size is fluid. Desktop: `html { font-size: calc(100vw / 90) }` (1 rem = 16 px at 1440 px wide). At 991 px wide and below: `calc(100vw / 60)`. At 600 px and below: `calc(100vw / 24.375)` (16 px at a 390 px phone).
+- Reset: border-box everywhere, zero margins and padding, links inherit colour with no underline, images block-level, `button` and `input` inherit font. The body is void-coloured, Courier Prime, `-webkit-font-smoothing: antialiased`, **`overflow-x: clip`** (not `hidden`; `hidden` would break the sticky footer in 5.6).
+- Lenis helper rules: `html.lenis, html.lenis body { height: auto }` and `.lenis.lenis-smooth { scroll-behavior: auto !important }`.
+- Layout grid: content sits inside `padding-inline: 3.8rem` (1.5 rem at ≤991). Sections are separated by 14 rem of vertical space.
+- Before the page is ready, `main` is `visibility: hidden` (until `html[data-page-ready]` is set). Every element that a reveal animates starts `visibility: hidden` and is shown by the reveal code.
+
+### Type styles
+
+| Style | Size (desktop / ≤991 / ≤600) | Other |
+|---|---|---|
+| Section headline | 7 rem / 5 rem / 3.4 rem | Courier Prime 700, line-height .95, letter-spacing −0.03em |
+| Giant display (contact) | 11 rem / 8 rem / 4.6 rem | Courier Prime 700, line-height .88, letter-spacing −0.04em, uppercase |
+| Statement (manifesto) | 2.8 rem / 2.2 rem / 1.6 rem | Courier Prime 400, line-height 1.3, letter-spacing −0.01em, colour paper |
+| Card title | 3 rem / 2.4 rem / 1.9 rem | Courier Prime 700, line-height 1.05 |
+| Body | 1.2 rem / 1.15 rem / 0.95 rem | Courier Prime 400, line-height 1.7, colour mute, max-width 31 rem |
+| Quote | 1.5 rem / 1.4 rem / 1.25 rem | Courier Prime italic 400, line-height 1.45, colour ink (on cream cards) |
+| Label / eyebrow | 0.75 rem | Courier Prime 400, uppercase, letter-spacing .14em, colour mute |
+| Mono small | 0.7 rem | Courier Prime 700, uppercase, letter-spacing .12em |
+
+SplitText line wrappers get `padding-bottom: .08em; margin-bottom: -.08em` so descenders aren't clipped by the line masks.
+
+### Shared components
+
+- **Keycap button**: 12.4 rem × 3.6 rem, key-grey background, ink text (Courier Prime 700, 0.8 rem, uppercase, letter-spacing .2em), 2 px radius, `box-shadow: inset 2px 2px 0 rgba(255,255,255,.28), inset -2px -2px 0 var(--key-shadow)`; on press it translates 1 px and the highlights invert.
+- **Link underline**: every text link has an empty 1 px underline box (absolute, full width, bottom −0.2em, paper colour) with `transform: scaleX(0)`; on hover it scales to 1 with `transform-origin: left` over .35 s `cubic-bezier(.65,.05,0,1)`, and on leave it scales back to 0 with `transform-origin: right`.
+- **Eyebrow index**: every section starts with an eyebrow in the form "[ 01 — ABOUT ]".
+
+## 4. Assets
+
+| Asset | What it is | Native size | Used in |
+|---|---|---|---|
+| Hands image | Stipple-halftone render of two cracked white marble hands holding an open, worn hardcover book, dramatic side light, pure black background, coarse dithering grain, 4:5 vertical. Served as `<HANDS_IMG_URL>` (a generated image; do not re-host). Prompt: *"Monochrome stipple-halftone render of two cracked white marble hands holding an open worn hardcover book, hairline cracks, chipped fingertips, dramatic side lighting, coarse grain and dithering like a photocopy, pure black background, vertical 4:5, no text."* | 1600×2000 | About figure |
+| Film grain | An inline SVG `feTurbulence` noise tile (`baseFrequency .9`, `numOctaves 2`, `stitchTiles`) as a data-URI background, 220×220 px | inline | Global overlay |
+
+If `<HANDS_IMG_URL>` is missing, render the figure as a void-coloured box with a hairline border and its caption; the animation runs the same.
+
+## 5. Page structure, top to bottom
+
+`<main>` contains the hero, then About (`#about`), Testimonials (`#readers`) and Contact (`#contact`). The Footer (`#footer`) is a sibling after `<main>`. Global fixed layers sit outside both.
+
+Nav link targets: **LIBRARY** and the wordmark's neighbours scroll to `#about`, **READING ROOMS** to `#readers`, **JOURNAL** to `#footer`, **MEMBERSHIP**, **SIGN IN** and the **TAKE A SEAT** ticket button to `#contact`. Every in-page `#` link scrolls with Lenis (`lenis.scrollTo(target, { duration: 1.6 })`).
+
+### 5.0 Global fixed layers
+
+- **Scroll progress bar**: fixed at the top, 2 px tall, full width, paper colour, `transform-origin: left`, z-index 60.
+- **Film grain overlay**: fixed, full screen, the noise tile as background, `opacity: .06`, pointer-events none, z-index 90.
+- **Block cursor** (fine hover pointer only; the system cursor is hidden with `cursor: none` on the page): a fixed 10 × 18 px paper block at the top-left, `mix-blend-mode: difference`, pointer-events none, z-index 100, blinking `animation: blink .53s steps(1) infinite` while idle.
+- **Section label** (desktop only): fixed at left 1.4 rem, bottom 1.6 rem, Label style in mute, showing "[ 02 / READERS ]" for the section in view.
+
+### 5.1 About (`#about`)
+
+**(a) Manifesto (pinned, 100vh).** A 12-column grid with 2 rem gaps, `padding-inline: 3.8rem`, items centred vertically.
+- Eyebrow "[ 01 — ABOUT ]" is absolute at top 7 rem, left 3.8 rem.
+- Columns 1–7: the statement, Statement style, `max-width: 47rem`: "Lacuna is a room with no screens, one long table, and a book on every chair. Come to read, to argue, and to <span class="strike">be told what to think</span><span class="repl">change your mind</span> — slowly, in person, out loud."
+  - Every word is wrapped by SplitText (`type: "words"`) except the `.strike` and `.repl` spans, which are split into words (strike) and chars (repl).
+  - `.strike` is `display: inline; box-decoration-break: clone`, with two background layers driven by two CSS custom properties: `background-image: linear-gradient(var(--paper), var(--paper)), linear-gradient(var(--paper), var(--paper)); background-repeat: no-repeat; background-position: 0 0, 0 52%; background-size: var(--sel, 0%) 100%, var(--strike, 0%) .09em`. Layer one is the selection block, layer two the strike line. Both work across line wraps.
+  - `.repl` is inline with its characters present at `opacity: 0` (so the layout is already reserved and nothing reflows when they appear).
+- Columns 8–12: a `<figure>` 4:5, `width: 100%`, `overflow: hidden`, containing the hands image (`object-fit: cover`) and a halftone overlay (`radial-gradient(#000 1px, transparent 1.4px)` at 4 px, `mix-blend-mode: multiply`, opacity .35). Under it a caption in Mono small: "FIG. 01 — THE LONG TABLE". Around the figure sit 14 absolutely positioned loose letters (Courier Prime 700, 0.9–1.4 rem, mute) at random positions, an echo of the hero's letter cloud.
+
+**(b) House rules: stacking cards.** An eyebrow "[ 02 — THE HOUSE RULES ]", then a stack of three cards, each `position: sticky; top: 14vh; height: 68vh; margin-bottom: 14vh`, width `min(72rem, 100%)`, background `#0a0c10`, 1 px hair border, 4 px radius, padding 3.2 rem, a two-column grid (5fr / 7fr, gap 3 rem):
+- Left: a giant outlined number ("01", "02", "03"; Courier Prime 700, 18 rem, `-webkit-text-stroke: 1.5px var(--paper)`, transparent fill, opacity .5) with a line icon under it (below).
+- Right, centred vertically: a Label "RULE 01 / 03", the Card title, and Body text.
+
+| # | Title | Body |
+|---|---|---|
+| 01 | One book a month | Everyone reads the same book, front to back, at their own pace. No summaries, no skimming, no audiobooks at 2×. |
+| 02 | Phones in the basket | Phones go in the basket by the door and stay there. Nothing in the room glows except the lamp on the long table. |
+| 03 | Argued over in person | Once a month we sit and argue about it until the last lamp. Nobody gets to say "I liked it" without a page number. |
+
+Icons (stroke paper, `stroke-width: 3`, no fill, round caps and joins, `viewBox 0 0 120 120`, 9 rem wide): **01 book** `M60 30C45 20 25 20 10 26V94C25 88 45 88 60 98C75 88 95 88 110 94V26C95 20 75 20 60 30ZM60 30V98`; **02 phone in a basket** basket `M20 60H100L90 100H30Z`, handle `M35 60C35 30 85 30 85 60`, phone `M52 34H68Q70 34 70 36V62Q70 64 68 64H52Q50 64 50 62V36Q50 34 52 34Z`, weave `M30 72H90M33 86H87`; **03 two speech bubbles** `M12 20H72V62H36L22 76V62H12Z` and `M48 78H108V100H98V112L84 100H48Z`.
+
+**(c) Stats.** A row of three, `padding: 8rem 3.8rem`, a 1 px hair rule on top, three equal columns with a hair rule between them. Each: an odometer number (Courier Prime 700, 8 rem) and a Label under it.
+
+| Number | Label |
+|---|---|
+| 1240 | MEMBERS |
+| 58 | BOOKS ARGUED OVER |
+| 6 | ROOMS IN 3 CITIES |
+
+Each digit lives in its own `.digit` box (`height: 1em; overflow: hidden`) holding a vertical strip of the digits 0–9 (each 1em tall), so the digit can roll.
+
+### 5.2 Testimonials (`#readers`)
+
+A 100vh pinned section with a horizontal track. Background: a giant outlined word "READERS" (Courier Prime 700, 34 rem, `-webkit-text-stroke: 1px var(--paper)`, transparent fill, opacity .12, nowrap), absolutely positioned behind the track, vertically centred.
+- **Track**: a flex row, `align-items: center`, `padding-inline: 3.8rem`, gap 5 rem, `width: max-content`. First item, the **intro panel** (width 38 rem): eyebrow "[ 03 — READERS ]", the Section headline "What the margins say" (three lines), and a Label "SCROLL →" with the arrow blinking (`steps(1)`, .8 s).
+- Then six **library cards**, each 26 rem × 34 rem, background `sheet`, ink text, 3 px radius, padding 2.2 rem, `box-shadow: 0 2rem 4rem rgba(0,0,0,.55)`, with a base rotation and vertical offset (alternating):
+
+| Card | Rotation | Offset (`margin-top`) |
+|---|---|---|
+| 1 | −3° | −4 rem |
+| 2 | 2° | 3 rem |
+| 3 | −1.5° | −3 rem |
+| 4 | 3° | 4 rem |
+| 5 | −2° | −2 rem |
+| 6 | 1° | 3 rem |
+
+Card layout, top to bottom: a row with "NO. 0142" (Mono small, ink) on the left and "MEMBER SINCE 2022" (Mono small, ink at 55 %) on the right; a dotted 1 px ink rule; the Quote; another dotted rule; the name (Courier Prime 700, 1rem) with the role under it (ink at 60 %); and at bottom-right a **due-date block**: "DATE DUE" (Mono small) over a date in Courier Prime 700, 1.1 rem. The **stamp** sits over the card's lower right, rotated: a circle 8.5 rem across, 3 px double border in `stamp`, "RETURNED" in Courier Prime 700, 1.2 rem, uppercase, `stamp` colour, a small date line under it, `mix-blend-mode: multiply`, `opacity: 0` until slammed.
+
+| Card | Quote | Name, role | Due |
+|---|---|---|---|
+| 1 | "I hadn't finished a book in six years. Lacuna got me through four in one winter, and my phone only came out of the basket twice." | Noor Hamdan, product designer | 14 NOV 26 |
+| 2 | "The arguments are the best part. Nobody is allowed to say ‘I liked it’ without a page number." | Daan Visser, teacher | 21 NOV 26 |
+| 3 | "It's the only place I've been where silence feels like company." | Mila Okafor, nurse | 28 NOV 26 |
+| 4 | "I came for the quiet and stayed for the people who argue about it." | Kenji Mori, translator | 05 DEC 26 |
+| 5 | "One book a month sounded like too little. It turned out to be exactly enough to change my mind about things." | Yara Haddad, architect | 12 DEC 26 |
+| 6 | "My head is quieter. My shelves are louder." | Sem de Vries, chef | 19 DEC 26 |
+
+- **Progress bar** (bottom of the pinned view, left 3.8 rem, bottom 3 rem): a counter "01 / 06" in Mono small and, beside it, a 20 rem × 1 px hair line with a paper fill (`scaleX`, origin left).
+- **≤991 px**: no pin and no horizontal track. The intro panel becomes a normal block; the cards stack in a single column (width `min(26rem, 100%)`, gap 3 rem, rotations halved, offsets removed); the giant word is hidden.
+
+### 5.3 Contact (`#contact`)
+
+`padding: 14rem 3.8rem`, a two-column grid (1fr / 34 rem, gap 6 rem), items start-aligned.
+- **Left column**: eyebrow "[ 04 — CONTACT ]"; the Giant display "TAKE A / SEAT." (two lines); the Body text "Tell us what you're reading, or what you wish you were. We reply within a day, usually from the long table."; and a details list (Label above value, each row separated by a hair rule, padding 1.2 rem 0, value 1.2 rem paper with the link underline): **ADDRESS** "14 Marlowe Lane, basement door", **HOURS** "Tue–Sun, 4 pm–11 pm", **EMAIL** "seats@lacuna.club".
+- **Right column: the sheet.** A typewriter setup, top to bottom:
+  - The **platen**: a 34 rem × 3 rem rounded bar (`border-radius: 1.5rem`, background `linear-gradient(#17181c, #0c0d10)`), with a knurled texture (`repeating-linear-gradient(90deg, #ffffff10 0 2px, transparent 2px 6px)`), and a round 3.6 rem knob at each end (dark, with six radial grip lines) that rotates. z-index above the sheet.
+  - The **sheet** directly under it: `sheet` background, ink text, width 34 rem, `padding: 3rem 2.6rem 2.6rem 4.2rem`, `box-shadow: 0 3rem 6rem rgba(0,0,0,.6)`, rotated −1.2°. A column of 12 punched circles (0.9 rem, void-coloured, `box-shadow: inset 0 1px 2px rgba(0,0,0,.6)`) runs down the left edge at 1.2 rem from the edge, 3.2 rem apart, like a paper feed.
+  - Sheet content, in order: a heading "FORM 114 — REQUEST A SEAT" (Courier Prime 700, 1.1 rem, with a 2 px ink underline); fields, each a Label (ink at 60 %) over an input with a 1 px ink bottom border, 1.2 rem text, 2.6 rem tall: **NAME**, **EMAIL**, **WHAT ARE YOU READING?** (a 3-row textarea); a **WHICH ROOM?** row of three radio chips ("BASEMENT", "ROOFTOP", "LONG TABLE": 1 px ink border, 0.75 rem text, padding .5 rem 1 rem; the selected chip is filled ink with sheet-coloured text); and the keycap button "SEND IT →" bottom-left.
+  - Focus state: the input's border becomes 2 px, and the caret is a block (`caret-color: var(--stamp); caret-shape: block;`, progressive enhancement).
+- **≤991 px**: the grid becomes one column (gap 5 rem), the sheet is `width: min(34rem, 100%)`, the platen narrows to match.
+
+### 5.4 Footer (`#footer`)
+
+A **curtain-reveal footer**. `<main>` has `position: relative; z-index: 1` and a void background. The footer is `position: sticky; bottom: 0; z-index: 0; height: 100vh; min-height: 46rem` and comes after `<main>` in the document, so it sits pinned underneath the page, and as the last section of `<main>` scrolls away the footer is revealed. Background: `linear-gradient(#050608 55%, #0b0f17 100%)`. Inside, `padding: 7rem 3.8rem 2rem`, a column flex with space between:
+- **Top row**: left, a statement in Statement size (but 2 rem) and mute colour: "Come for the book. Stay for the quiet."; right, three columns of links (gap 5 rem) with a Label heading and links in 1.1 rem paper with the link underline: **ROOMS**: Basement, Rooftop, Long Table. **CLUB**: About, Readers, Membership, Journal. **ELSEWHERE**: Instagram, Substack, Email.
+- **Reading list form** (below the top row, left): a Label "JOIN THE READING LIST", then a single row: an email input (1 px paper bottom border, 1.2 rem) and a small keycap button "→" 3.2 rem square. The input has a typed **placeholder animation** (6.5).
+- **Marquee strip**: full width, a hair rule above and below, padding 1.1 rem 0, Mono small in mute: "ONE BOOK A MONTH ✦ PHONES IN THE BASKET ✦ ARGUE ABOUT IT ✦ ". Two copies side by side, running left (6.9).
+- **Giant wordmark**: "LACUNA", Courier Prime 700, `font-size: calc((100vw - 7.6rem) / 3.6)` (Courier is 0.6 em wide, so six letters fill the content width exactly), line-height .8, letter-spacing 0, no wrapping. Each letter is its own `.ch` span with the **halftone fill**: `-webkit-text-fill-color: transparent; background-image: radial-gradient(circle at 50% 50%, var(--paper) var(--dot, .9px), transparent calc(var(--dot, .9px) + .5px)); background-size: 4px 4px; -webkit-background-clip: text; background-clip: text;`. At rest `--dot` is .9px (a fine dotted letter); at 2.6px the dots merge into a near-solid letter.
+- **Bottom bar**: left "© 2026 Lacuna Reading Rooms. Made slowly." (Label style); right, the **back-to-top button**: a 3.4 rem circle, a 1 px hair ring, with a second ring on top that is the progress ring (an SVG circle r 22, stroke paper 1.5 px, round caps, rotated −90°) and an up-arrow in the middle (`M12 20V4M5 11l7-7 7 7`, stroke paper 1.5, 24 px box).
+- **≤991 px**: the footer is `height: auto; position: relative` (no curtain, plain flow); the top row stacks, the link columns sit in a 2-column grid, and the giant wordmark keeps its calc size.
+
+## 6. Motion and interactions (all exact)
+
+### 6.1 Smooth scroll, ready and refresh
+Lenis with `{ lerp: 0.165, wheelMultiplier: 1.25 }`, driven by the GSAP ticker (`lenis.raf(time * 1000)`), with `lenis.on("scroll", ScrollTrigger.update)` and `gsap.ticker.lagSmoothing(0)`. Lenis is off under reduced motion. The page is ready when `document.fonts.ready` resolves or after 1.5 s; then set `html[data-page-ready]`, build every animation below, and call `ScrollTrigger.refresh()` once fonts and the hands image have loaded and again on `resize` (debounced 150 ms). Everything is created inside one `gsap.matchMedia()` with three contexts: **desktop** `(min-width: 992px)`, **mobile** `(max-width: 991px)` and **reduce** `(prefers-reduced-motion: reduce)`, so every ScrollTrigger is created and reverted with its media query.
+
+### 6.2 Hero exit and nav behaviour
+- **Hero exit** (desktop): a scrubbed ScrollTrigger on the hero (`start: "top top"`, `end: "bottom top"`, `scrub: true`): the copy column goes `y: -12vh` and `opacity: 1 → 0` (opacity finishes at 60 % of the range); the video goes `y: 8vh`, `scale: 1 → 1.06`, `opacity: 1 → .25`.
+- **Nav**: it hides when scrolling down and returns when scrolling up: `y: 0 → -100%` over .4 s `power3.out` (ScrollTrigger `onUpdate` with `self.direction`, only after 120 px of scroll). The ticket button's label changes to "SEND IT" while `#contact` is in view (6.11).
+
+### 6.3 Global layers
+- **Progress bar**: `scaleX: 0 → 1`, a ScrollTrigger on the whole page (`trigger: document.documentElement`, `start: "top top"`, `end: "bottom bottom"`, `scrub: 0.2`).
+- **Film grain**: jitter the tile every 90 ms with `gsap.set(grain, { x: random(-110,110), y: random(-110,110) })` on a `setInterval` (not under reduced motion).
+- **Section label**: one ScrollTrigger per section (hero "00 / OPEN", About "01 / ABOUT", Testimonials "02 / READERS", Contact "03 / CONTACT", Footer "04 / INDEX") with `start: "top 55%"`, `end: "bottom 45%"`, `onToggle`: when it becomes active, ScrambleText the label to its new text over 0.6 s (`scrambleText: { text, chars: "01ABCDEF/[]", speed: 0.6 }`).
+
+### 6.4 Block cursor (fine pointer, not reduced motion)
+`quickTo` x and y on the block (0.25 s, `power3`), snapping to the pointer on the first move; hidden (opacity 0) until then. While over any `a, button, label, [data-select]` the block turns into a **selection**: it tweens its x, y, width and height to the element's bounding rect (padding .15 rem) over 0.35 s `power3.out`, stops blinking, and its `mix-blend-mode: difference` inverts the text under it, exactly like the selected word in the hero headline. On leave it tweens back to 10 × 18 px at the pointer (0.3 s `power3.out`). Over text inputs the block hides and the native block caret takes over. Over the testimonial cards it stays the small block.
+
+### 6.5 Text reveals
+- **Headlines** (Section headline, "TAKE A SEAT.", footer statement): SplitText `type: "chars,words,lines"`, `mask: "lines"`, `linesClass: "line"`, `charsClass: "char"`. Chars from `yPercent: 110, opacity: 0` to 0 / 1, duration 0.9, `expo.out`, stagger 0.018, triggered once at `start: "top 85%"`.
+- **Eyebrows** and Labels: ScrambleText from empty to the full string over 0.9 s (`chars: "01ABCDEF/[]—"`, `speed: 0.5`), triggered once at `"top 90%"`.
+- **Body text**: SplitText `lines`, `yPercent: 100 → 0`, 0.8 s `expo.out`, stagger 0.07, once at `"top 88%"`.
+All of it is skipped under reduced motion.
+
+### 6.6 About: manifesto (pinned, scrubbed)
+One ScrollTrigger pins the manifesto: `trigger: .manifesto`, `start: "top top"`, `end: "+=300%"`, `pin: true`, `scrub: 0.5`, `anticipatePin: 1`, driving a timeline of length 10 with these beats:
+
+| t | Beat |
+|---|---|
+| 0–6.0 | Every word goes `opacity: .14 → 1`, `duration: 0.3`, `ease: "none"`, evenly staggered over the range (each word lights in turn). The `.strike` phrase lights with the others |
+| 0–2.0 | The figure's clip-path goes `inset(100% 0 0 0) → inset(0% 0 0 0)`, `power2.out`; the image inside goes `scale: 1.25 → 1` from 0 to 10 (linear) |
+| 6.2–6.8 | **Select**: the strike phrase's `--sel` goes `0% → 100%`, `ease: "power2.inOut"`, and its text colour goes to ink (so it reads as a selected block, like "self" in the hero) |
+| 6.8–7.2 | **Strike**: `--sel` goes back to `0%` (0.1 s) while the text colour tweens to struck grey, then `--strike` goes `0% → 100%` over 0.35 s `power2.out` |
+| 7.2–8.4 | **Replace**: the `.repl` characters go `opacity: 0 → 1`, `ease: "none"`, evenly staggered over the range (they "type in") |
+| 0–10 | The 14 loose letters around the figure drift: each `y` from 0 to a random −40…−160 px (linear), plus a tiny rotation drift |
+| 8.4–10 | Hold, then the pin releases |
+
+### 6.7 About: house rules (stacking cards)
+- Cards are sticky (5.1b). As each next card scrolls over the previous one, the previous one is scrubbed (`trigger: next card`, `start: "top 90%"`, `end: "top 14%"`, `scrub: true`): `scale: 1 → .94`, `opacity: 1 → .45`, `y: 0 → -3vh`, `filter: brightness(1) → brightness(.5)`.
+- When a card first enters (`start: "top 75%"`, once): its number ScrambleTexts from "00" to its value over 0.8 s (`chars: "0123456789"`), and its icon draws in with DrawSVG (`drawSVG: "0%" → "100%"`, 1.2 s, `power2.inOut`, paths staggered 0.12 s).
+
+### 6.8 About: stats (odometers)
+Once at `start: "top 80%"`: each `.digit` strip tweens `yPercent` from 0 to `-(digit × 10)` over 1.6 s with `expo.out`, staggered 0.08 s from the right-most digit. Then each stat's Label ScrambleTexts in (0.6 s).
+
+### 6.9 Testimonials: horizontal scroll, stamps and card tilt (desktop)
+- **Pin and scroll**: `trigger: #readers`, `start: "top top"`, `end: () => "+=" + (track.scrollWidth - innerWidth + 3.8rem in px)`, `pin: true`, `scrub: 1`, `invalidateOnRefresh: true`, `anticipatePin: 1`. It tweens the track `x: 0 → -(track.scrollWidth - innerWidth + padding)`, `ease: "none"`. Keep this tween as `containerAnimation` for the card triggers below.
+- **Giant word**: `x: 0 → -30vw` across the same scrub (so it drifts the opposite way to the cards' relative motion, about a third of the speed).
+- **Progress**: the counter shows the card nearest the centre ("01 / 06" to "06 / 06"; update with a one-frame ScrambleText), and the fill goes `scaleX: 0 → 1` on the same scrub.
+- **Quote typing**: each card's quote is split into chars (SplitText `chars`); chars start at `opacity: 0`; when the card reaches `left 80%` (a ScrollTrigger with `containerAnimation`, `start: "left 80%"`, once) the chars go `opacity: 0 → 1` with `ease: "none"`, `stagger: 0.012`, which types the quote.
+- **Tilt**: each card's `rotation` goes from its base value to 0 as it arrives at the middle (`containerAnimation`, `start: "left 85%"`, `end: "center 50%"`, `scrub: true`, `ease: "none"`), then back to its base value as it leaves (`start: "center 50%"`, `end: "right 15%"`, `scrub: true`).
+- **Stamp slam**: when a card's centre crosses 55 % of the viewport width (`containerAnimation`, `start: "center 55%"`, once), a timeline on that card runs: the stamp `scale: 2.4 → 1`, `opacity: 0 → .9`, `rotation: base + 18° → base` over 0.22 s `power4.in`; then the card shakes (`x: 5 → -4 → 3 → 0`, three 0.04 s steps, `y: 2 → 0`, yoyo) so it feels struck; and the due-date text gets a brief ink bleed (`text-shadow` from `0 0 6px rgba(17,17,17,.4)` to none over 0.4 s). The stamp stays.
+- **≤991 px**: no horizontal track. Each card enters with `y: 60 → 0`, `rotation: base + 4° → base`, `opacity: 0 → 1` over 0.9 s `expo.out` at `"top 85%"`, then the quote types and the stamp slams at `"top 65%"`.
+
+### 6.10 Contact: platen roll-out and typed form
+- **Headline**: "TAKE A SEAT." is a **scrubbed** flip rather than the standard reveal: SplitText `chars`, each from `rotationX: -90, y: 40%, opacity: 0, transformOrigin: "50% 100%", transformPerspective: 800` to rest, `stagger: 0.04`, `ease: "none"`, scrubbed from `start: "top 85%"` to `end: "top 35%"` (`scrub: 0.6`).
+- **Sheet timeline** (scrubbed, `trigger: .sheet-wrap`, `start: "top 80%"`, `end: "top 15%"`, `scrub: 0.6`, length 10):
+
+| t | Beat |
+|---|---|
+| 0–5 | The sheet unrolls out of the platen: `clip-path: inset(0 0 100% 0) → inset(0 0 0% 0)` and `yPercent: -35 → 0`, `ease: "none"` |
+| 0–10 | Both platen knobs rotate `0 → 540°` (linear) |
+| 4–5.5 | The heading types in (counter tween over its characters) |
+| 5–9 | Each label types in, one after another (counter tweens, evenly staggered, each ~1 unit long) |
+| 5.5–9.5 | Each input's bottom border draws `scaleX: 0 → 1` (origin left), staggered with the labels; the radio chips fade in `opacity: 0 → 1`, `y: 8 → 0` |
+| 9–10 | The keycap button fades in with the 3-step flicker (`0 → .4 → 0 → 1`, `steps(3)`) |
+
+- **Keystroke feel**: on every `input` event in the sheet the sheet does a 1 px strike: `gsap.fromTo(sheet, { y: 0 }, { y: 1, duration: 0.06, yoyo: true, repeat: 1, ease: "power1.inOut" })`.
+- **Magnetic keycap** (fine pointer): `quickTo` x and y on the button (0.5 s `power3`), pulling it toward the pointer by `0.35 × offset` while within 90 px; on leave it springs back (`x: 0, y: 0`, 0.8 s `elastic.out(1, 0.4)`).
+- **Submit**: the form is front-end only. Validate (name and a valid email required; invalid fields get a stamp-coloured border and a 0.3 s horizontal shake of ±6 px). On success the button label changes to "SENDING…" for 600 ms (or until the optional `data-endpoint` request resolves), then:
+  1. **Letters fly off**: SplitText `chars` on every label, field value and the heading; each char goes to a random `x: ±(80…320)`, `y: -(120…520)`, `rotation: ±(40…160)`, `opacity: 0` over 1.1 s `power2.in`, `stagger: { amount: 0.5, from: "random" }`. Inputs and chips fade out in the same 0.6 s.
+  2. **Confirmation types in** where the form was: "SEAT RESERVED." (Courier Prime 700, 2.2 rem, ink), then a line "We'll write to {email} within a day." (1.1 rem), typed with counter tweens (0.6 s, then 0.9 s).
+  3. A "CONFIRMED" stamp (same style and slam as the testimonial stamp, but `stamp` fill at .9 and 9.5 rem across) slams onto the lower-right of the sheet.
+  4. The keycap reads "SENT ✓" and is disabled.
+
+### 6.11 Contact: nav hand-off
+While `#contact` is in view (`start: "top 60%"`, `end: "bottom 40%"`), the nav ticket button's label ScrambleTexts from "TAKE A SEAT" to "SEND IT" (0.4 s), and back when it leaves.
+
+### 6.12 Footer: curtain reveal, letters assemble, halftone proximity (desktop)
+- **Curtain**: pure CSS (5.4). Additionally the footer's inner content is scrubbed (`trigger: main`, `start: "bottom bottom"`, `end: "bottom top"`, `scrub: true`): `yPercent: -22 → 0`, so it rises slightly as it is revealed.
+- **Letters assemble** (same trigger and scrub): each `.ch` of the giant wordmark goes **from** a scattered state to rest: `x: random(-30vw, 30vw)`, `y: random(-70vh, -20vh)`, `rotation: random(-70, 70)`, `scale: .4`, `opacity: 0` **to** `x: 0, y: 0, rotation: 0, scale: 1, opacity: 1`, `ease: "power3.out"`, with `stagger: { each: 0.06, from: "random" }`, so the six letters fly together from the middle of the screen and lock into LACUNA exactly as the footer is fully revealed. (It reads as the hero's letter cloud in reverse.)
+- **Halftone proximity** (fine pointer, not reduced motion): on every GSAP tick, for each `.ch`, measure the distance `d` from the pointer to the letter's centre; `f = d >= 300 ? 0 : 1 - d / 300`; target `--dot = .9 + (2.6 - .9) × f` (px). If the target changed by at least 0.05, tween the letter's `--dot` with `gsap.quickTo(ch, "--dot", { duration: 0.4, ease: "power2.out", unit: "px" })`; letters near the pointer fill in from fine dots to near-solid, and drift back when it leaves. Re-measure the letter centres on resize and on every scroll event.
+- **Marquee**: both copies tween `xPercent: -100`, `repeat: -1`, `ease: "none"`, duration 40 s for one pass. A ScrollTrigger over the footer flips `timeScale` to −1 when scrolling up and +1 when scrolling down (animated over 0.3 s).
+- **Placeholder typing**: the reading-list input's placeholder cycles through "Middlemarch…", "Blindness…", "The Dispossessed…", "Pedro Páramo…": each types in char by char (0.07 s/char), holds 1.6 s, deletes (0.04 s/char), then the next, forever (a looping GSAP timeline that sets `input.placeholder`); it pauses when the input is focused or has a value.
+- **Back-to-top**: the progress ring draws with DrawSVG from `"0% 0%"` to `"0% 100%"` scrubbed across the whole page (`start: "top top"`, `end: "bottom bottom"`, `scrub: true`); hover: the arrow slides up out of the circle and a copy slides in from below (0.5 s `cubic-bezier(.175,.885,.32,1.275)`); click: `lenis.scrollTo(0, { duration: 2.2 })`.
+
+### 6.13 Mobile and tablet (≤991 px)
+No pin on About or Testimonials; no horizontal track; no stacking sticky cards (the three rule cards become a normal column with the standard card entrance: `y: 50 → 0`, `opacity: 0 → 1`, 0.8 s `expo.out`, once at `"top 85%"`); the manifesto still lights word by word but scrubbed over the section's own height (`start: "top 75%"`, `end: "bottom 45%"`, `scrub: true`) with the same select, strike and replace beats at 70 %, 78 % and 86 % of that range; no block cursor, no halftone proximity, no magnetic button; the footer is plain flow and the letters assemble across `start: "top 85%"`, `end: "top 35%"`, `scrub: true` instead.
+
+## 7. Reduced motion
+
+`prefers-reduced-motion: reduce` gives: no Lenis, no pinning, no scrub, no reveals, no stamps slamming, no letters assembling, no odometer rolling, no marquee, no grain jitter, no block cursor, no keystroke strike. Everything shows its **final state**: the manifesto fully lit with "be told what to think" struck out and "change your mind" shown after it, the stats at their final numbers, the three rule cards as a normal column, the testimonial cards in a responsive grid (`repeat(auto-fill, minmax(22rem, 1fr))`, gap 2.5 rem) with their stamps already in place, the sheet fully shown, the footer as plain flow with LACUNA assembled (`--dot` 1.6px). The back-to-top ring is a static 100 % ring. The form still works (validation and the confirmation appear instantly, with no letters flying off).
+
+## 8. Acceptance checklist
+- Scrolling out of the hero lifts the headline copy and fades the video; the nav hides while scrolling down and returns on scrolling up; a thin paper bar fills across the top of the page.
+- In About, the page pins and the manifesto lights up word by word while the hands image wipes up from the bottom and slowly settles. Then the words "be told what to think" are selected as a block, struck out with a line, and "change your mind" types in after them.
+- The three house-rule cards stack: each new card slides over the last, which shrinks, dims and darkens; the numbers scramble into place and the line icons draw themselves. The stats roll like odometers.
+- In Testimonials, the page pins and the cream library cards travel sideways behind a huge outlined "READERS", straightening as they reach the middle. Each quote types out, and a red RETURNED stamp slams onto the card with a small shake as it crosses the centre.
+- In Contact, "TAKE A SEAT." flips up letter by letter with scroll. A paper sheet rolls out of a typewriter platen as you scroll, its knobs turning, and its labels type themselves. Every keystroke nudges the sheet. The keycap is magnetic. Submitting makes all the text fly off as letters and a "SEAT RESERVED." confirmation types in with a CONFIRMED stamp.
+- The Footer is revealed from beneath the page like a curtain. Scattered letters fly together into a giant halftone-dotted LACUNA as it appears; the letters fill in near the pointer. The marquee reverses when you scroll up. The back-to-top ring fills as you scroll.
+- The block cursor turns into a text selection over links and buttons.
+- Reduced motion: everything shows its final state with no animation and no pinning.
+- Tablet and phone (≤991 px): no pinning, no horizontal track, no cursor effects; cards and sections enter with simple reveals, and there is no horizontal scroll.
