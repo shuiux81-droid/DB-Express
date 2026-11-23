@@ -1,4 +1,4 @@
-import { bootHero } from './boot/heroBoot.js';
+import { bootHero, registerCoreGsapOnce } from './boot/heroBoot.js';
 import { initScrollExperience } from './engine/scrollExperience.js';
 import {
   yieldToMain,
@@ -8,10 +8,22 @@ import {
 async function bootstrap() {
   try {
     await bootHero();
+    if (typeof window.__resolveHeroReady === 'function') {
+      window.__resolveHeroReady();
+    } else {
+      window.__heroReady = true;
+    }
     await yieldToMain();
     /* R6-C */
     await yieldPhoneMacrotask();
     /* /R6-C */
+
+    if (typeof window.__loadScrollTrigger === 'function') {
+      await window.__loadScrollTrigger();
+    } else if (window.__scrollTriggerReady) {
+      await window.__scrollTriggerReady;
+    }
+    registerCoreGsapOnce();
 
     initScrollExperience({
       hydrators: {
@@ -28,6 +40,11 @@ async function bootstrap() {
     await yieldPhoneMacrotask();
     /* /R6-C */
   } finally {
+    if (typeof window.__resolveHeroReady === 'function') {
+      window.__resolveHeroReady();
+    } else {
+      window.__heroReady = true;
+    }
     if (typeof window.__resolveAppReady === 'function') {
       window.__resolveAppReady();
     } else {

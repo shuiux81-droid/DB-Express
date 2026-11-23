@@ -111,8 +111,12 @@
   const I = S(N, 6e3);
 
   const waitForAppReady = (fn) => {
-    const appPending = !self.__appReady && self.__appReadyPromise;
-    const cssPending = !self.__sectionCssDone && self.__sectionCssReady;
+    const isPhone = matchMedia('(max-width:600px)').matches;
+    const readyFlag = isPhone && '__heroReady' in self ? self.__heroReady : self.__appReady;
+    const readyPromise =
+      isPhone && self.__heroReadyPromise ? self.__heroReadyPromise : self.__appReadyPromise;
+    const appPending = !readyFlag && readyPromise;
+    const cssPending = !isPhone && !self.__sectionCssDone && self.__sectionCssReady;
     if (!appPending && !cssPending) {
       fn();
       return;
@@ -126,7 +130,7 @@
     };
     const cap = S(go, 4e3);
     Promise.all([
-      appPending ? self.__appReadyPromise : Promise.resolve(),
+      appPending ? readyPromise : Promise.resolve(),
       cssPending ? self.__sectionCssReady : Promise.resolve(),
     ]).then(go, go);
   };
