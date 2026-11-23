@@ -1,3 +1,5 @@
+Not used. Phones load the full fonts.
+
 # Phone Critical Arabic Font Subsets (`pyftsubset`)
 
 Run these commands from the project root directory on macOS **before** copying `index.html` and the updated CSS files back into your live/Lighthouse test copy.
