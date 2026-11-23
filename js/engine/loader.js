@@ -110,9 +110,8 @@
 
   const I = S(N, 6e3);
 
-  const isPhone = matchMedia('(max-width:600px)').matches;
-
   const waitForAppReady = (fn) => {
+    const isPhone = matchMedia('(max-width:600px)').matches;
     const readyFlag = isPhone && '__heroReady' in self ? self.__heroReady : self.__appReady;
     const readyPromise =
       isPhone && self.__heroReadyPromise ? self.__heroReadyPromise : self.__appReadyPromise;
@@ -211,9 +210,10 @@
     const f0 = (now) => {
       if (!t0) t0 = now;
       const elapsed = now - t0;
-      const target = isPhone ? w || 10 : elapsed < 2e3 ? w || 10 : 100;
+      const target = elapsed < 2e3 ? w || 10 : 100;
       const eased = p + (target - p) * 0.2;
-      p = isPhone ? eased : eased < elapsed / 7 ? eased : elapsed / 7;
+      const cap = elapsed / 7;
+      p = eased < cap ? eased : cap;
       if (target > 99 && p >= 99.5) p = 100;
 
       const rounded = (p + 0.5) | 0;
@@ -248,14 +248,6 @@
         }
 
         showMark();
-        if (isPhone) {
-          o(x, 120, 0);
-          y(Y, '6px', 0, 120, 0, 0, 1);
-          [j, g, k].forEach((el) => o(el, 120, 0));
-          U(() => d.classList.add('is-fading'), 120);
-          J(120, 160, 120, 80, 200, 200, 550);
-          return;
-        }
         A(
           x,
           [
