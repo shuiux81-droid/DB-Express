@@ -1264,3 +1264,17 @@
     margin-bottom: 0;
   }
 }
+
+@media (max-width: 600px) {
+  #about {
+    margin-top: -1.5rem;
+    position: relative;
+    z-index: 3;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+  }
+
+  #about .manifesto {
+    background-color: transparent;
+  }
+}
