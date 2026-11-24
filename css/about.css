@@ -71,14 +71,6 @@
   font-weight: 700;
 }
 
-.m-caret-anchor {
-  display: inline;
-}
-
-.manifesto-caret {
-  background-color: #111111;
-}
-
 /* Interface Forge Figure Column (6 of 12 columns >= 5) */
 .manifesto-visual.figure-col {
   --maroon: #7a0f14;

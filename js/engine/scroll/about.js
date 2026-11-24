@@ -34,11 +34,6 @@ export function createAboutSteps(env) {
   const strikeSpan = liveStatementEl.querySelector('.m-strike');
   const replSpan = liveStatementEl.querySelector('.m-repl');
   const afterSpan = liveStatementEl.querySelector('.m-after');
-  const caretBeforeAnchor = liveStatementEl.querySelector('.m-caret-before');
-  const caretStrikeAnchor = liveStatementEl.querySelector('.m-caret-strike');
-  const caretReplAnchor = liveStatementEl.querySelector('.m-caret-repl');
-  const caretEndAnchor = liveStatementEl.querySelector('.m-caret-end');
-  const manifestoCaret = liveStatementEl.querySelector('.manifesto-caret');
 
   const figureStageEl = manifestoEl.querySelector('.figure-stage');
   const figureEl = manifestoEl.querySelector('.figure');
@@ -196,18 +191,6 @@ export function createAboutSteps(env) {
   let lastStrikeLine = null;
   let lastReplCount = -1;
   let lastAfterCount = -1;
-  let lastMCaretHidden = null;
-  let lastMCaretAnchor = null;
-  let lastMCaretTyping = null;
-
-  const placeManifestoCaret = (anchor) => {
-    if (!manifestoCaret || !anchor) return;
-    if (lastMCaretAnchor === anchor && manifestoCaret.parentElement === anchor) return;
-    lastMCaretAnchor = anchor;
-    if (manifestoCaret.parentElement !== anchor) {
-      anchor.appendChild(manifestoCaret);
-    }
-  };
 
   const syncManifestoTyping = (t) => {
     if (beforeSpan) {
@@ -260,49 +243,6 @@ export function createAboutSteps(env) {
       if (count !== lastAfterCount) {
         lastAfterCount = count;
         afterSpan.textContent = afterText.slice(0, count);
-      }
-    }
-
-    if (manifestoCaret) {
-      const shouldHide = hasStrike && t >= tSelectStart && t < tStrikeEnd;
-      if (shouldHide) {
-        if (lastMCaretHidden !== true) {
-          lastMCaretHidden = true;
-          manifestoCaret.classList.add('is-hidden');
-        }
-        if (lastMCaretTyping !== false) {
-          lastMCaretTyping = false;
-          manifestoCaret.classList.remove('is-typing');
-        }
-      } else {
-        if (lastMCaretHidden !== false) {
-          lastMCaretHidden = false;
-          manifestoCaret.classList.remove('is-hidden');
-        }
-        let isTypingNow = false;
-        if (t < tBeforeEnd) {
-          placeManifestoCaret(caretBeforeAnchor);
-          isTypingNow = t > 0;
-        } else if (hasStrike && t < tStrikeTextEnd) {
-          placeManifestoCaret(caretStrikeAnchor);
-          isTypingNow = true;
-        } else if (hasStrike && t < tReplaceStart) {
-          placeManifestoCaret(caretStrikeAnchor);
-          isTypingNow = false;
-        } else if (t < tReplaceEnd) {
-          placeManifestoCaret(caretReplAnchor);
-          isTypingNow = true;
-        } else if (t < tAfterEnd) {
-          placeManifestoCaret(caretEndAnchor);
-          isTypingNow = true;
-        } else {
-          placeManifestoCaret(caretEndAnchor);
-          isTypingNow = false;
-        }
-        if (isTypingNow !== lastMCaretTyping) {
-          lastMCaretTyping = isTypingNow;
-          manifestoCaret.classList.toggle('is-typing', isTypingNow);
-        }
       }
     }
   };
@@ -444,10 +384,6 @@ export function createAboutSteps(env) {
         }
         if (replSpan) replSpan.textContent = replaceText;
         if (afterSpan) afterSpan.textContent = afterText;
-        if (manifestoCaret) {
-          manifestoCaret.classList.remove('is-hidden', 'is-typing');
-          placeManifestoCaret(caretEndAnchor);
-        }
         if (postLikesCountEl) postLikesCountEl.textContent = formatSocialCounter(12400, false);
         FORGE_NOTIF_CHIPS.forEach((chip, idx) => {
           if (notifCountEls[idx]) {

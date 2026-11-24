@@ -516,6 +516,10 @@
 }
 
 @media (max-width: 600px) {
+  .drops-section.services {
+    height: auto;
+    overflow: visible;
+  }
   .drops-section.services .section-h2 {
     font-size: clamp(2.1rem, 10.6vw, 3.4em);
   }
