@@ -110,9 +110,16 @@
 
   const I = S(N, 6e3);
 
+  const mob = matchMedia('(max-width:600px)').matches;
+
   const waitForAppReady = (fn) => {
-    const appPending = !self.__appReady && self.__appReadyPromise;
-    const cssPending = !self.__sectionCssDone && self.__sectionCssReady;
+    const heroP = self.__heroReadyPromise;
+    const appPending = mob
+      ? heroP
+        ? !self.__heroReady && heroP
+        : !self.__appReady && self.__appReadyPromise
+      : !self.__appReady && self.__appReadyPromise;
+    const cssPending = !mob && !self.__sectionCssDone && self.__sectionCssReady;
     if (!appPending && !cssPending) {
       fn();
       return;
@@ -126,8 +133,8 @@
     };
     const cap = S(go, 4e3);
     Promise.all([
-      appPending ? self.__appReadyPromise : Promise.resolve(),
-      cssPending ? self.__sectionCssReady : Promise.resolve(),
+      appPending || Promise.resolve(),
+      cssPending || Promise.resolve(),
     ]).then(go, go);
   };
 
@@ -206,10 +213,10 @@
     const f0 = (now) => {
       if (!t0) t0 = now;
       const elapsed = now - t0;
-      const target = elapsed < 2e3 ? w || 10 : 100;
+      const target = mob ? w || 10 : elapsed < 2e3 ? w || 10 : 100;
       const eased = p + (target - p) * 0.2;
       const cap = elapsed / 7;
-      p = eased < cap ? eased : cap;
+      p = mob ? eased : eased < cap ? eased : cap;
       if (target > 99 && p >= 99.5) p = 100;
 
       const rounded = (p + 0.5) | 0;
@@ -233,7 +240,7 @@
       self.__mark?.('minimum hold finished');
       waitForAppReady(() => {
         if (V) return;
-        S(N, 1600, 1);
+        S(N, mob ? 1000 : 1600, 1);
         s.textContent = M;
 
         if (m) {
@@ -244,6 +251,24 @@
         }
 
         showMark();
+        if (mob) {
+          A(
+            x,
+            [
+              { '--sel': '0%', color: '#f3f0eab3', easing: E[2] },
+              { '--sel': '100%', color: '#050505', offset: 0.652 },
+              { '--sel': '0%', color: '#f3f0ea73' },
+            ],
+            100
+          );
+          A(x, { '--strike-w': ['0%', '100%'] }, 60, 60, 2);
+          o(x, 60, 110);
+          y(Y, '6px', 0, 60, 110, 0, 1);
+          [j, g, k].forEach((el) => o(el, 120, 80));
+          U(() => d.classList.add('is-fading'), 60);
+          J(120, 160, 120, 80, 200, 200, 550);
+          return;
+        }
         A(
           x,
           [

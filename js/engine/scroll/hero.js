@@ -9,7 +9,13 @@ export function initHeroScroll({
 }) {
   // Nav slide-down on loader:reveal
   const siteNavEl = document.querySelector('.site-nav');
-  if (siteNavEl) {
+  if (
+    siteNavEl &&
+    !window.__dxNavRevealArmed &&
+    !window.__loaderDone &&
+    !document.documentElement.classList.contains('loader-revealing')
+  ) {
+    window.__dxNavRevealArmed = true;
     gsap.set(siteNavEl, { y: -18, opacity: 0 });
     let navCancelled = false;
     ctxCleanups.push(() => {

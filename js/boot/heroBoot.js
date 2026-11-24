@@ -4,7 +4,18 @@ import {
   yieldToMain,
   /* R6-C */ yieldPhoneMacrotask, /* /R6-C */
 } from '../utils/bootScheduler.js';
-import { recordSectionInit } from '../engine/scroll/shared.js';
+
+function recordHeroInit(totalMs) {
+  const list = (window.__dxSectionInits = window.__dxSectionInits || []);
+  const rounded = Number((totalMs ?? 0).toFixed(1));
+  list.push({
+    section: 'hero',
+    atMs: Math.round(performance.now()),
+    totalMs: rounded,
+    maxChunkMs: rounded,
+    chunks: 1,
+  });
+}
 
 export function registerCoreGsapOnce() {
   const { gsap, ScrollTrigger, SplitText, ScrambleTextPlugin, DrawSVGPlugin } = window;
@@ -34,7 +45,7 @@ export async function bootHero() {
   const t0 = performance.now();
   const cleanupHero = initHero();
   const heroMs = performance.now() - t0;
-  recordSectionInit('hero', { totalMs: heroMs, maxChunkMs: heroMs, chunks: 1 });
+  recordHeroInit(heroMs);
   if (typeof cleanupHero === 'function') cleanups.push(cleanupHero);
   await yieldToMain();
   /* R6-C */

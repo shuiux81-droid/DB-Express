@@ -1,5 +1,4 @@
 import { initLacunaSync } from '../engine/lacunaSync.js';
-import { scrollToTarget } from '../engine/scrollExperience.js';
 import {
   HEAD_AFTER_SELF,
   HEAD_BEFORE_SELF,
@@ -51,7 +50,8 @@ export function initHero() {
 
   // Hero CTA smooth scroll binding
   if (ctaEl) {
-    const onClick = () => scrollToTarget('#contact', 1.6);
+    const onClick = () =>
+      import('../engine/scrollExperience.js').then((m) => m.scrollToTarget('#contact', 1.6));
     ctaEl.addEventListener('click', onClick);
     cleanups.push(() => ctaEl.removeEventListener('click', onClick));
   }

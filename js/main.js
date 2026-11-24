@@ -1,17 +1,43 @@
-import { bootHero } from './boot/heroBoot.js';
-import { initScrollExperience } from './engine/scrollExperience.js';
+import { bootHero, registerCoreGsapOnce } from './boot/heroBoot.js';
 import {
   yieldToMain,
   /* R6-C */ yieldPhoneMacrotask, /* /R6-C */
 } from './utils/bootScheduler.js';
 
+const resolveHeroReady = () => {
+  if (typeof window.__resolveHeroReady === 'function') {
+    window.__resolveHeroReady();
+  } else {
+    window.__heroReady = true;
+  }
+};
+
 async function bootstrap() {
   try {
+    const isDesktopBoot = window.matchMedia('(min-width: 601px)').matches;
+    const scrollModPromise = isDesktopBoot
+      ? import('./engine/scrollExperience.js')
+      : null;
+
+    if (window.__gsapReadyPromise) {
+      await window.__gsapReadyPromise;
+    }
+
     await bootHero();
+    resolveHeroReady();
     await yieldToMain();
     /* R6-C */
     await yieldPhoneMacrotask();
     /* /R6-C */
+
+    if (window.__stReadyPromise) {
+      await window.__stReadyPromise;
+      registerCoreGsapOnce();
+    }
+
+    const { initScrollExperience } = await (
+      scrollModPromise || import('./engine/scrollExperience.js')
+    );
 
     initScrollExperience({
       hydrators: {
@@ -28,6 +54,7 @@ async function bootstrap() {
     await yieldPhoneMacrotask();
     /* /R6-C */
   } finally {
+    resolveHeroReady();
     if (typeof window.__resolveAppReady === 'function') {
       window.__resolveAppReady();
     } else {
